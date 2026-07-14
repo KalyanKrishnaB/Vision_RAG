@@ -1,24 +1,17 @@
 from pdf_reader import extract_pages
-from chunker import DocumentBuffer
+from text_splitter import get_text_splitter
+from embeddings import EmbeddingModel
 
-PDF_PATH = "sample.pdf"
+splitter = get_text_splitter()
+model = EmbeddingModel()
 
-def inspect_pdf(pdf_path:str):
-    print("="*70)
-    print("pdf inspector")
-    print("="*70)
+for document in extract_pages("sample.pdf"):
+
+    chunks = splitter.split_documents([document])
     
-    for page in extract_pages(pdf_path):
-
-        print("-" * 70)
-        print(f"Page {page.page_number}")
-        print(f"Has Text : {page.has_text}")
-        print(f"Images   : {page.image_count}")
-        print(f"Length   : {page.text_length}")
-
-        if page.has_text:
-            print(page.text[:200].replace("\n", " "))
-
-
-if __name__ == "__main__":
-    inspect_pdf(PDF_PATH)
+    print(f"\npage {document.metadata['page_number']} has {len(chunks)} chunks:")
+    
+    for index, chunk in enumerate(chunks, start= 1):
+        print("-"*40)
+        print(f"chunk {index +1}: {chunk.page_content[:250]}... (length: {len(chunk.page_content)})")
+        print(model.encode(chunk.page_content))
