@@ -1,7 +1,10 @@
 from page import PageData
+from tokenizer import Tokenizer
 
 class DocumentBuffer:
-    def __init__(self):
+    def __init__(self, max_tokens:int = 512):
+        self.tokenizer = Tokenizer()
+        self.max_tokens = max_tokens
         self.pages = []
         
     def add_page(self, page:PageData):
@@ -19,5 +22,9 @@ class DocumentBuffer:
         return [page.page_number for page in self.pages]
     
     @property
-    def text_length(self):
-        return len(self.text)
+    def token_count(self):
+        return self.tokenizer.count_tokens(self.text)
+    
+    @property
+    def is_full(self):
+        return self.token_count >= self.max_tokens

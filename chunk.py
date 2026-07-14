@@ -7,6 +7,7 @@ class ChunkData:
     page_numbers : list[int]
     chunk_index : int
     text : str
+    token_count : int
     
     @property
     def text_length(self) -> int:

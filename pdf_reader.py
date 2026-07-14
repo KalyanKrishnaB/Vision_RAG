@@ -1,6 +1,5 @@
 import fitz
-
-from page import PageData
+from langchain_core.documents import Document
 
 
 def extract_pages(pdf_path: str):
@@ -9,19 +8,26 @@ def extract_pages(pdf_path: str):
     """
 
     document = fitz.open(pdf_path)
+    
+
 
     try:
         for page_number in range(document.page_count):
+            page = document.load_page(page_number)
+            text = page.get_text().strip()
 
             page = document.load_page(page_number)
 
-            yield PageData(
-                page_number=page_number + 1,
-                text=page.get_text().strip(),
-                image_count=len(page.get_images(full=True)),
-                width=page.rect.width,
-                height=page.rect.height,
-                rotation=page.rotation,
+            yield Document(
+                page_content = text,
+                metadata = {
+                    "page_number": page_number + 1,
+                    "image_count": len(page.get_images(full=True)),
+                    "width": page.rect.width,
+                    "height": page.rect.height,
+                    "rotation": page.rotation
+                },
+                    
             )
 
     finally:
